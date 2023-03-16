@@ -1,7 +1,6 @@
 # ethers-fireblocks
 
-Library to make it easy to perform fireblocks transactions by using the ethers
-library.
+Integrate Fireblocks into ethers, using a signer. 
 
 ## Installation
 
@@ -15,7 +14,15 @@ yarn add ethers-fireblocks
 ## Usage
 
 ```ts
-import {FireblocksSigner} from "./fireblocks-signer";
+import {FireblocksSigner} from "ethers-fireblocks";
+import {JsonRpcProvider} from "@ethersproject/providers";
+import {FireblocksSDK} from "fireblocks-sdk";
 
-const signer = new FireblocksSigner();
+const fireblocks = new FireblocksSDK(privateKey, apiKey);
+
+// Can be any kind of ethers `Provider`
+const provider = new JsonRpcProvider('someRPCURl');
+
+// create the signer
+const signer = new FireblocksSigner(fireblocks, provider);
 ```
