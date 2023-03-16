@@ -1,5 +1,5 @@
-import {logger, Signer} from 'ethers';
-import {Deferrable} from 'ethers/lib/utils';
+import {BigNumber, BytesLike, logger, Signer} from 'ethers';
+import {Deferrable, hexlify, isBytesLike, toUtf8Bytes} from 'ethers/lib/utils';
 import {Provider, TransactionRequest} from '@ethersproject/providers';
 import {Logger} from '@ethersproject/logger';
 import {TransactionResponse} from '@ethersproject/abstract-provider';
@@ -10,8 +10,10 @@ import {
   getAssetId,
   getFireblocksAccount,
   sendTransaction,
+  waitForTxInfo,
   wrapTransaction,
 } from './lib';
+import {signMessage} from './lib/signMessage';
 
 export class FireblocksSigner extends Signer {
   #fireblocks: FireblocksSDK;
@@ -30,14 +32,42 @@ export class FireblocksSigner extends Signer {
     return account.address;
   }
 
-  signMessage(): Promise<string> {
-    return logger.throwError(
-      'signing messsage is not supported',
-      Logger.errors.UNSUPPORTED_OPERATION,
+  async signMessage(
+    message: BytesLike,
+    bip44addressIndex = 0
+  ): Promise<string> {
+    const content = hexlify(
+      isBytesLike(message) ? message : toUtf8Bytes(message)
+    );
+
+    const response = await signMessage(
+      this.#fireblocks,
+      await this.getAccountDetails(),
       {
-        operation: 'signMessage',
+        messages: [
+          {
+            content,
+            bip44addressIndex,
+          },
+        ],
       }
     );
+    const {signedMessages} = await waitForTxInfo(this.#fireblocks, response.id);
+    if (!signedMessages) {
+      return logger.throwError(
+        'missing signedTransactions from response',
+        Logger.errors.UNKNOWN_ERROR,
+        {
+          operation: 'signMessage',
+          message,
+        }
+      );
+    }
+
+    const signature = signedMessages[0].signature;
+    return `${
+      signature.v ? BigNumber.from(signature.v).add(31).toHexString() : ''
+    }${signature.fullSig}`;
   }
 
   signTransaction(): Promise<string> {

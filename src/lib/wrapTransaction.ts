@@ -1,5 +1,5 @@
 import {TransactionResponse} from '@ethersproject/abstract-provider';
-import {waitForTxHash} from './waitForTxHash';
+import {waitForTxInfo} from './waitForTxInfo';
 import {FireblocksSDK} from 'fireblocks-sdk';
 import {Provider, TransactionRequest} from '@ethersproject/providers';
 import {hexlify} from 'ethers/lib/utils';
@@ -20,8 +20,8 @@ export const wrapTransaction = (
     nonce: 0,
     value: BigNumber.from(tx.value || 0),
     async wait(confirmations, timeout?: number) {
-      const hash = await waitForTxHash(fireblocks, id);
-      return provider.waitForTransaction(hash, confirmations, timeout);
+      const {txHash} = await waitForTxInfo(fireblocks, id);
+      return provider.waitForTransaction(txHash, confirmations, timeout);
     },
     hash: id,
   };

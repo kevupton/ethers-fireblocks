@@ -14,15 +14,15 @@ const FINAL_TRANSACTIONS: TransactionStatus[] = [
   TransactionStatus.REJECTED,
 ];
 
-export const waitForTxHash = async (
+export const waitForTxInfo = async (
   fireblocks: FireblocksSDK,
   txId: string,
   retryDelay?: number,
   timeoutMs?: number
-): Promise<string> => {
-  let resolve!: (value: string) => void;
-  let reject!: (reason: any) => void;
-  const promise = new Promise<string>((res, rej) => {
+): Promise<TransactionResponse> => {
+  let resolve!: (value: TransactionResponse) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<TransactionResponse>((res, rej) => {
     resolve = res;
     reject = rej;
   });
@@ -43,10 +43,10 @@ export const waitForTxHash = async (
     );
   }, timeoutMs);
 
-  tryGetTxInfo(txId, fireblocks, () => hasTimedOut, retryDelay)
+  tryGetTxInfo(txId, fireblocks, () => !hasTimedOut, retryDelay)
     .then(txInfo => {
       clearTimeout();
-      resolve(txInfo.txHash);
+      resolve(txInfo);
     })
     .catch(error => reject(error));
 

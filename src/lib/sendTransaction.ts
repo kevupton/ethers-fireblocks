@@ -4,8 +4,13 @@ import {
   TransactionArguments,
   TransactionOperation,
 } from 'fireblocks-sdk';
-import {formatEther, formatUnits, Logger} from 'ethers/lib/utils';
-import {logger} from 'ethers';
+import {
+  formatEther,
+  formatUnits,
+  hexDataLength,
+  Logger,
+} from 'ethers/lib/utils';
+import {BigNumber, logger} from 'ethers';
 import {FireblocksAccount} from './getFireblocksAccount';
 import {TransactionRequest} from '@ethersproject/providers';
 
@@ -21,7 +26,7 @@ export const sendTransaction = (
   options: SendTransactionOptions
 ) => {
   const txArguments: TransactionArguments = {
-    operation: TransactionOperation.CONTRACT_CALL,
+    operation: getOperation(transaction),
     assetId: account.assetId,
     source: {
       type: PeerType.VAULT_ACCOUNT,
@@ -61,3 +66,18 @@ export const sendTransaction = (
   };
   return fireblocks.createTransaction(txArguments);
 };
+
+function getOperation(transaction: TransactionRequest) {
+  if (transaction.data && hexDataLength(transaction.data) > 0) {
+    return TransactionOperation.CONTRACT_CALL;
+  } else if (transaction.to && BigNumber.from(transaction.value || 0).gt(0)) {
+    return TransactionOperation.TRANSFER;
+  }
+  return logger.throwError(
+    'Could not determine a valid transaction type',
+    Logger.errors.UNSUPPORTED_OPERATION,
+    {
+      transaction,
+    }
+  );
+}

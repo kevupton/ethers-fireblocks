@@ -1,3 +1,5 @@
 node_modules
 .idea
-build
+.env
+fireblocks_secret.key
+dist
