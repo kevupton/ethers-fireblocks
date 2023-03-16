@@ -1,12 +1,17 @@
 {
   "name": "ethers-fireblocks",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "Fireblocks signer and provider for ethers",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "repository": "https://github.com/kevupton/ethers-fireblocks",
   "author": "Kevin Upton <k_upton@live.com>",
   "license": "MIT",
   "dependencies": {
+    "@ethersproject/abstract-provider": "^5.7.0",
+    "@ethersproject/logger": "^5.7.0",
+    "@ethersproject/properties": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@ethersproject/web": "^5.7.1",
     "ethers": "^5",
     "fireblocks-defi-sdk": "^1.2.16",
     "fireblocks-sdk": "^4.0.0"
