@@ -36,7 +36,7 @@
     "compile": "tsc -p tsconfig.build.json",
     "test": "jest",
     "fix": "gts fix",
-    "prepare": "yearn clean && yarn run compile",
+    "prepare": "yarn clean && yarn run compile",
     "posttest": "yarn run lint"
   }
 }

@@ -1,0 +1,15 @@
+node_modules
+src
+tests
+.eslintrc.json
+.eslintignore
+.env
+fireblocks_secret.key
+jest.config.js
+babel.config.js
+.prettierrc.js
+tsconfig.json
+tsconfig.build.json
+.editorconfig
+
+!dist
